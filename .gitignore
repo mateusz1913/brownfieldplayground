@@ -13,3 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# JS
+node_modules
