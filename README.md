@@ -1,5 +1,7 @@
 # Brownfield RN Android
 
+## Basic setup
+
 (Based on RN 0.77 docs section - https://reactnative.dev/docs/integration-with-existing-apps?package-manager=yarn&language=kotlin&ios-language=swift)
 
 1. Create directory for JS code, e.g. `./js`
@@ -654,4 +656,283 @@ class MainApplication: Application(), ReactApplication {
     </application>
 
 </manifest>
+```
+
+## React Navigation setup
+
+1. Follow the "Basic setup"
+2. Prepare additional setup for 3p native libraries in `app/build.gradle.kts`
+```diff
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
+    id("com.facebook.react")
+}
+
++val JS_SRC_DIR = "../js"
++project.ext.set("REACT_NATIVE_NODE_MODULES_DIR", file("$JS_SRC_DIR/node_modules/react-native"))
++rootProject.ext.set("minSdk", 28)
++rootProject.ext.set("minSdkVersion", 28)
+```
+3. Create another custom `ReactActivity`
+```
+// `./app/src/main/java/com/brownfield/project/MyReactNavigationActivity.kt`
+package com.brownfield.project
+
+import android.os.Bundle
+import com.facebook.react.ReactActivity
+import com.facebook.react.ReactActivityDelegate
+import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
+import com.facebook.react.defaults.DefaultReactActivityDelegate
+
+class MyReactNavigationActivity: ReactActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(null)
+    }
+
+    override fun getMainComponentName(): String {
+        return "TestNavigation"
+    }
+
+    override fun createReactActivityDelegate(): ReactActivityDelegate {
+        return DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
+    }
+}
+```
+4. Add new activity in `android/app/src/main/AndroidManifest.xml`
+```diff
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:name=".MainApplication"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Brownfieldtest"
+        tools:targetApi="31">
+
++        <activity
++            android:name=".MyReactNavigationActivity"
++            android:label="reactnavigationbrownfieldtest"
++            android:theme="@style/Theme.Brownfieldtest">
++        </activity>
+    </application>
+
+</manifest>
+```
+5. Add code that will navigate to new activity in `MainActivity`
+```
+Button(onClick = {
+    val intent = Intent(this@MainActivity, MyReactNavigationActivity::class.java)
+
+    startActivity(intent)
+}) {
+    Text("Open React Navigation")
+}
+```
+6. Add react-navigation libraries and dependencies in `package.json` (follow `https://reactnavigation.org/docs/native-stack-navigator`)
+7. Add additional configuration for `react-native-reanimated` in `babel.config.js` and `metro.config.js`
+8. Do the sample navigation setup:
+```
+// js/src/TestNavigation/screens/Detail.tsx
+import type { StaticScreenProps } from '@react-navigation/native';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import Animated from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+type DetailProps = StaticScreenProps<{ id: string; imageUrl: string; title: string }>;
+
+// Reanimated Shared Transitions are only supported on old arch atm
+
+const Detail = ({ route }: DetailProps) => {
+    return (
+        <SafeAreaView style={styles.safeArea}>
+            <View style={styles.main}>
+                <Animated.Image
+                    sharedTransitionTag={`image-${route.params.id}`}
+                    src={route.params.imageUrl}
+                    style={styles.image}
+                />
+                <Text style={styles.title}>{route.params.title}</Text>
+            </View>
+        </SafeAreaView>
+    );
+};
+
+const styles = StyleSheet.create({
+    image: {
+        alignSelf: 'stretch',
+        aspectRatio: 1,
+    },
+    main: {
+        alignItems: 'center',
+        alignSelf: 'stretch',
+        flex: 1,
+        justifyContent: 'center',
+    },
+    safeArea: {
+        alignSelf: 'stretch',
+        flex: 1,
+    },
+    title: {
+        color: 'purple',
+        fontSize: 36,
+        padding: 20,
+    },
+});
+
+export default Detail;
+```
+
+```
+// js/src/TestNavigation/screens/Initial.tsx
+import { useNavigation } from '@react-navigation/native';
+import React, { useCallback } from 'react';
+import type { ListRenderItemInfo } from 'react-native';
+import { FlatList, Pressable, StyleSheet, Text } from 'react-native';
+import Animated from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+const ITEM_HEIGHT = 200;
+
+type ItemT = {
+    id: string;
+    imageUrl: string;
+    title: string;
+};
+
+const DATA = Array
+    .from({ length: 60 }, (_, i) => i + 200)
+    .map<ItemT>((id) => ({
+        id: `${id}`,
+        imageUrl: `https://picsum.photos/id/${id}/${ITEM_HEIGHT}/300`,
+        title: `Image ${id}`,
+    }));
+
+const ITEM_RIPPLE = { color: '#BCBCBCBC', foreground: true };
+
+// Reanimated Shared Transitions are only supported on old arch atm
+
+const Item = ({ id, imageUrl, title }: ItemT) => {
+    const navigation = useNavigation();
+    const handlePress = useCallback(() => {
+        navigation.navigate('Detail', { id, imageUrl, title });
+    }, [navigation.navigate]);
+
+    return (
+        <Pressable
+            android_ripple={ITEM_RIPPLE}
+            onPress={handlePress}
+            style={styles.item}>
+            <Animated.Image
+                sharedTransitionTag={`image-${id}`}
+                src={imageUrl}
+                style={styles.itemImage}
+            />
+        </Pressable>
+    );
+};
+
+function getItemLayout(data: ArrayLike<ItemT>, index) {
+    return { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index };
+}
+
+function keyExtractor(item: ItemT) {
+    return item.id;
+}
+
+function renderItem({ item }: ListRenderItemInfo<ItemT>) {
+    return <Item id={item.id} imageUrl={item.imageUrl} title={item.title} />
+}
+
+const Initial = () => {
+    return (
+        <SafeAreaView style={styles.safeArea}>
+            <FlatList
+                data={DATA}
+                getItemLayout={getItemLayout}
+                initialNumToRender={7}
+                keyExtractor={keyExtractor}
+                renderItem={renderItem}
+                style={styles.list}
+                windowSize={3}
+            />
+        </SafeAreaView>
+    );
+};
+
+const styles = StyleSheet.create({
+    item: {
+        alignItems: 'center',
+        alignSelf: 'stretch',
+        height: ITEM_HEIGHT,
+    },
+    itemImage: {
+        height: ITEM_HEIGHT,
+        width: 300,
+    },
+    list: {
+        alignSelf: 'stretch',
+        flex: 1,
+    },
+    safeArea: {
+        alignSelf: 'stretch',
+        flex: 1,
+    },
+});
+
+export default Initial;
+```
+
+```
+// js/src/TestNavigation/index.tsx
+import type { StaticParamList } from '@react-navigation/native';
+import { createStaticNavigation } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React from 'react';
+
+import DetailScreen from './screens/Detail';
+import InitialScreen from './screens/Initial';
+
+const RootStack = createNativeStackNavigator({
+    screens: {
+        Initial: InitialScreen,
+        Detail: DetailScreen,
+    },
+});
+
+type RootStackParamList = StaticParamList<typeof RootStack>;
+
+declare global {
+  namespace ReactNavigation {
+    interface RootParamList extends RootStackParamList {}
+  }
+}
+
+const Navigation = createStaticNavigation(RootStack);
+
+export default Navigation;
+```
+
+```diff
+// js/index.js
+import { AppRegistry } from 'react-native';
+
+import Test from './src/Test';
+import TestEmbedded from './src/TestEmbedded';
++import TestNavigation from './src/TestNavigation';
+
+AppRegistry.registerComponent('Test', () => Test);
+AppRegistry.registerComponent('TestEmbedded', () => TestEmbedded);
++AppRegistry.registerComponent('TestNavigation', () => TestNavigation);
 ```

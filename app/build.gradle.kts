@@ -5,6 +5,11 @@ plugins {
     id("com.facebook.react")
 }
 
+val JS_SRC_DIR = "../js"
+project.ext.set("REACT_NATIVE_NODE_MODULES_DIR", file("$JS_SRC_DIR/node_modules/react-native"))
+rootProject.ext.set("minSdk", 28)
+rootProject.ext.set("minSdkVersion", 28)
+
 android {
     namespace = "dev.mateusz1913.brownfieldtest"
     compileSdk = 35

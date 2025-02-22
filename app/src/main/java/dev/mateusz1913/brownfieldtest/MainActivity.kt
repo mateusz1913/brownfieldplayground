@@ -47,6 +47,13 @@ class MainActivity : AppCompatActivity(), DefaultHardwareBackBtnHandler {
                         }) {
                             Text("Open React")
                         }
+                        Button(onClick = {
+                            val intent = Intent(this@MainActivity, MyReactNavigationActivity::class.java)
+
+                            startActivity(intent)
+                        }) {
+                            Text("Open React Navigation")
+                        }
                         MyReactNativeComposable(
                             componentName = "TestEmbedded",
                             modifier = Modifier
