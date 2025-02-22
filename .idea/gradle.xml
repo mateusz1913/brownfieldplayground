@@ -31,6 +31,7 @@
             <option value="$PROJECT_DIR$/js/node_modules/@react-native/gradle-plugin/settings-plugin" />
             <option value="$PROJECT_DIR$/js/node_modules/@react-native/gradle-plugin/shared" />
             <option value="$PROJECT_DIR$/js/node_modules/@react-native/gradle-plugin/shared-testutil" />
+            <option value="$PROJECT_DIR$/js/node_modules/react-native-gesture-handler/android" />
             <option value="$PROJECT_DIR$/js/node_modules/react-native-reanimated/android" />
             <option value="$PROJECT_DIR$/js/node_modules/react-native-safe-area-context/android" />
             <option value="$PROJECT_DIR$/js/node_modules/react-native-screens/android" />
