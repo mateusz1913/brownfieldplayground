@@ -58,7 +58,14 @@
         - Configure ReactSettingsExtension like so:
         ```
         extensions.configure<com.facebook.react.ReactSettingsExtension> {
-            autolinkLibrariesFromCommand(workingDirectory = file(JS_SRCS_DIR))
+            autolinkLibrariesFromCommand(
+                workingDirectory = file(JS_SRCS_DIR),
+                lockFiles = files(
+                    "$JS_SRCS_DIR/yarn.lock",
+                    "$JS_SRCS_DIR/package.json",
+                    "$JS_SRCS_DIR/react-native.config.js"
+                )
+            )
         }
         ```
         - Add React Native Gradle Plugin for all projects `includeBuild("$JS_SRCS_DIR/node_modules/@react-native/gradle-plugin")`
