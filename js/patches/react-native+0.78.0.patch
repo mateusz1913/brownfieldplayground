@@ -1,0 +1,37 @@
+diff --git a/node_modules/react-native/React/CoreModules/RCTDeviceInfo.mm b/node_modules/react-native/React/CoreModules/RCTDeviceInfo.mm
+index 95395e1..4327e88 100644
+--- a/node_modules/react-native/React/CoreModules/RCTDeviceInfo.mm
++++ b/node_modules/react-native/React/CoreModules/RCTDeviceInfo.mm
+@@ -222,11 +222,15 @@ - (void)interfaceOrientationDidChange
+ - (void)_interfaceOrientationDidChange
+ {
+ #if TARGET_OS_IOS && !TARGET_OS_MACCATALYST
+-  UIApplication *application = RCTSharedApplication();
+-  UIInterfaceOrientation nextOrientation = RCTKeyWindow().windowScene.interfaceOrientation;
++//  UIApplication *application = RCTSharedApplication();
++  UIWindow *keyWindow = RCTKeyWindow();
++//  UIInterfaceOrientation nextOrientation = RCTKeyWindow().windowScene.interfaceOrientation;
++  UIInterfaceOrientation nextOrientation = keyWindow.windowScene.interfaceOrientation;
+ 
++//  BOOL isRunningInFullScreen =
++//      CGRectEqualToRect(application.delegate.window.frame, application.delegate.window.screen.bounds);
+   BOOL isRunningInFullScreen =
+-      CGRectEqualToRect(application.delegate.window.frame, application.delegate.window.screen.bounds);
++      CGRectEqualToRect(keyWindow.frame, keyWindow.screen.bounds);
+   // We are catching here two situations for multitasking view:
+   // a) The app is in Split View and the container gets resized -> !isRunningInFullScreen
+   // b) The app changes to/from fullscreen example: App runs in slide over mode and goes into fullscreen->
+diff --git a/node_modules/react-native/React/CoreModules/RCTRedBox.mm b/node_modules/react-native/React/CoreModules/RCTRedBox.mm
+index d427c05..8f862ec 100644
+--- a/node_modules/react-native/React/CoreModules/RCTRedBox.mm
++++ b/node_modules/react-native/React/CoreModules/RCTRedBox.mm
+@@ -222,7 +222,8 @@ - (NSInteger)bottomSafeViewHeight
+ #if TARGET_OS_MACCATALYST
+   return 0;
+ #else
+-  return RCTSharedApplication().delegate.window.safeAreaInsets.bottom;
++//  return RCTSharedApplication().delegate.window.safeAreaInsets.bottom;
++  return RCTKeyWindow().safeAreaInsets.bottom;
+ #endif
+ }
+ 
