@@ -10,6 +10,8 @@ project.ext.set("REACT_NATIVE_NODE_MODULES_DIR", file("$JS_SRC_DIR/node_modules/
 rootProject.ext.set("REACT_NATIVE_NODE_MODULES_DIR", file("$JS_SRC_DIR/node_modules/react-native"))
 rootProject.ext.set("minSdk", 28)
 rootProject.ext.set("minSdkVersion", 28)
+rootProject.ext.set("compileSdkVersion", 35)
+rootProject.ext.set("targetSdkVersion", 35)
 
 android {
     namespace = "dev.mateusz1913.brownfieldtest"
@@ -32,6 +34,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
@@ -76,7 +79,6 @@ react {
     reactNativeDir = file("${JS_SRC_DIR}/node_modules/react-native")
     codegenDir = file("${JS_SRC_DIR}/node_modules/@react-native/codegen")
     cliFile = file("${JS_SRC_DIR}/node_modules/@react-native-community/cli/build/bin.js")
-    bundleCommand = ""
     entryFile = file("${JS_SRC_DIR}/index.js")
     jsRootDir = file(JS_SRC_DIR)
 

@@ -1,0 +1,61 @@
+appId: dev.mateusz1913.brownfieldtest
+---
+- launchApp
+- assertVisible:
+    text: "Widget one"
+- assertVisible:
+    text: "Widget two"
+- scrollUntilVisible:
+    element:
+        text: "Sample embedded widget"
+    direction: DOWN
+- scrollUntilVisible:
+    element:
+        text: "Open React"
+    direction: UP
+- tapOn:
+    text: "Open React"
+- assertVisible:
+    text: "Sample Widget"
+- back
+- tapOn:
+    text: "Cancel"
+- assertVisible:
+    text: "Sample Widget"
+- back
+- tapOn:
+    text: "Exit"
+- assertVisible:
+    text: "Open React"
+- assertVisible:
+    text: "Open React Navigation"
+- tapOn:
+    text: "Open React Navigation"
+- assertVisible:
+    id: "image-200"
+- scrollUntilVisible:
+    element:
+        id: "image-230"
+    direction: DOWN
+    speed: 80
+- tapOn:
+    id: "image-230"
+- assertVisible:
+    id: "image-detail-230"
+- assertVisible:
+    text: "Image 230"
+- tapOn:
+    id: "image-detail-230"
+- assertVisible:
+    id: "image-detail-modal-230"
+- back
+- assertVisible:
+    id: "image-detail-230"
+- assertVisible:
+    text: "Image 230"
+- back
+- assertVisible:
+    id: "image-230"
+- back
+- assertVisible:
+    text: "Open React Navigation"

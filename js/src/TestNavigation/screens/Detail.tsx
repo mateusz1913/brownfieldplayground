@@ -26,7 +26,8 @@ const Detail = ({ route }: DetailProps) => {
                 <Pressable
                     android_ripple={ITEM_RIPPLE}
                     onPress={handlePress}
-                    style={styles.imageContainer}>
+                    style={styles.imageContainer}
+                    testID={`image-detail-${route.params.id}`}>
                     <Animated.Image
                         sharedTransitionTag={`image-${route.params.id}`}
                         src={route.params.imageUrl}

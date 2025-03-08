@@ -71,6 +71,7 @@ const DetailImageModal = ({ route }: DetailImageModalProps) => {
                     sharedTransitionTag={`image-${route.params.id}`}
                     src={route.params.imageUrl}
                     style={[styles.image, animatedStyle]}
+                    testID={`image-detail-modal-${route.params.id}`}
                 />
             </GestureDetector>
             <GestureDetector gesture={tapCloseGesture}>

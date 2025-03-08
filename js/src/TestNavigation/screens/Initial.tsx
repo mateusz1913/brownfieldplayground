@@ -35,7 +35,8 @@ const Item = ({ id, imageUrl, title }: ItemT) => {
         <Pressable
             android_ripple={ITEM_RIPPLE}
             onPress={handlePress}
-            style={styles.item}>
+            style={styles.item}
+            testID={`image-${id}`}>
             <Animated.Image
                 sharedTransitionTag={`image-${id}`}
                 src={imageUrl}
